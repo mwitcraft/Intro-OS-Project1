@@ -71,9 +71,10 @@ int main(int argc, char** argv){
 			/* If target is a file, only print out that file */
 			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
 			if(!strcmp(args[0], "filez")){
+				/* printf("\t%i\n", argNum); */
 				/* printf("Filez\n"); */
 				char* command;
-				if(args[1] != NULL){
+				if(argNum == 2){
 
 					command = "ls -1 ";
 
