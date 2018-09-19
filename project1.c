@@ -69,10 +69,13 @@ int main(int argc, char** argv){
 
 			/* System 'ls -l [target]' where target may or may not be specified  */
 			/* If target is a file, only print out that file */
+			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
 			if(!strcmp(args[0], "filez")){
-				printf("Filez\n");
-				char* command = "ls -l ";
+				/* printf("Filez\n"); */
+				char* command;
 				if(args[1] != NULL){
+
+					command = "ls -1 ";
 
 					/* command = strcat(command, args[1]); */
 					/* printf("\t\tCommand: %s", command); */
@@ -81,7 +84,9 @@ int main(int argc, char** argv){
 					char* ret = (char*)(malloc)(len * sizeof(char) + 1);
 					/* *ret = '\0'; */
 					command = strcat(strcat(ret, command), args[1]);
-					printf("\t\tCommand: %s\n", command);
+					/* printf("\t\tCommand: %s\n", command); */
+				} else {
+					command = "ls -1";
 				}
 				/* system("ls -l ../"); */
 				system(command);
