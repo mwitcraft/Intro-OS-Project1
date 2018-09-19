@@ -113,8 +113,11 @@ int main(int argc, char** argv){
 			/* System echo with args */
 			/* 'Echo [comment]' */
 			if(!strcmp(args[0], "ditto")){
-				printf("'ditto' entered\n");
-				system("echo mason");
+				char* comment;
+				for(int i = 1; i < argNum; ++i){
+					printf("%s ", args[i]);
+				}
+				printf("\n");
 			}
 
 			/* Prints README */
