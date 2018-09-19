@@ -6,6 +6,11 @@
 #define MAX_ARGS 64
 #define SEPARATORS " \t\n"
 
+int wipe(){
+	system("clear");
+	return 0;
+}
+
 int main(int argc, char** argv){
 
 	char buf[MAX_BUFFER];
@@ -53,19 +58,19 @@ int main(int argc, char** argv){
 
 			/* System clear */
 			if(!strcmp(args[0], "wipe")){
-
+				wipe();
 			}
 
 			/* System 'ls -l [target]' where target may or may not be specified  */
 			/* If target is a file, only print out that file */
 			if(!strcmp(args[0], "filez")){
-
+				printf("Filez\n");
 			}
 
 			/* System env
 			 * Lists all of the environment strings */
 			if(!strcmp(args[0], "environ")){
-
+				printf("environ\n");
 			}
 
 			/* System echo with args */
@@ -77,32 +82,32 @@ int main(int argc, char** argv){
 
 			/* Prints README */
 			if(!strcmp(args[0], "help")){
-
+				printf("help\n");
 			}
 
 			/* System 'cp [src] [dst]' */
 			/* Don't use system cp call */
 			if(!strcmp(args[0], "mimic")){
-
+				printf("mimic\n");
 			}
 
 			/* System 'rm [file]'	 */
 			/* Don't use system rm call */
 			if(!strcmp(args[0], "erase")){
-
+				printf("erase\n");
 			}
 
 			/* System 'mv [src] [dst]' */
 			/* Don't use system call */
 			if(!strcmp(args[0], "morph")){
-
+				printf("morph\n");
 			}
 
 			/* System 'cd [path]' */
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			if(!strcmp(args[0], "chdir")){
-
+				printf("chdir\n");
 			}
 
 		}
