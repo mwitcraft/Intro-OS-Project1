@@ -6,9 +6,15 @@
 #define MAX_ARGS 64
 #define SEPARATORS " \t\n"
 
+extern char** environ;
+
 int wipe(){
 	system("clear");
 	return 0;
+}
+
+int filez(){
+
 }
 
 int main(int argc, char** argv){
@@ -65,12 +71,37 @@ int main(int argc, char** argv){
 			/* If target is a file, only print out that file */
 			if(!strcmp(args[0], "filez")){
 				printf("Filez\n");
+				char* command = "ls -l ";
+				if(args[1] != NULL){
+
+					/* command = strcat(command, args[1]); */
+					/* printf("\t\tCommand: %s", command); */
+
+					size_t len = strlen(command) + strlen(args[1]);
+					char* ret = (char*)(malloc)(len * sizeof(char) + 1);
+					/* *ret = '\0'; */
+					command = strcat(strcat(ret, command), args[1]);
+					printf("\t\tCommand: %s\n", command);
+				}
+				/* system("ls -l ../"); */
+				system(command);
 			}
 
 			/* System env
 			 * Lists all of the environment strings */
 			if(!strcmp(args[0], "environ")){
 				printf("environ\n");
+				char** env = environ;
+				while(*env){
+					if(strstr(*env, "PWD") != NULL && strstr(*env, "OLDPWD") == NULL){
+						/* *env = "PWD=I/CHANGED/IT"; */
+						printf("\t\t%s\n", *env);
+					}
+					*env++;
+					/* printf("%s\n", *env++); */
+
+				}
+				
 			}
 
 			/* System echo with args */
