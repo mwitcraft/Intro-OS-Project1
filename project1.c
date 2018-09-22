@@ -1,6 +1,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/sendfile.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define MAX_BUFFER 1024
 #define MAX_ARGS 64
@@ -14,7 +18,18 @@ int wipe(){
 }
 
 int filez(){
+	return 0;
+}
 
+int mimic(int sourceDescriptor, int destDescriptor){
+	struct stat toGetSize;
+	fstat(sourceDescriptor, &toGetSize);
+	int sourceSizeInBytes = toGetSize.st_size;
+	
+	int sendfileStatus = sendfile(destDescriptor, sourceDescriptor, NULL, sourceSizeInBytes);
+	
+
+	return sendfileStatus;
 }
 
 int main(int argc, char** argv){
@@ -23,7 +38,7 @@ int main(int argc, char** argv){
 	char* args[MAX_ARGS];
 	char** arg;
 	char* prompt = "==>";
-	int argNum;
+	int argNum;https://www.google.com/search?q=c+open+permission+denied&ie=utf-8&oe=utf-8&client=firefox-b-1-ab
 
 	/* #<{(| printf("argc: %i", argc); |)}># */
 	/* for(int i = 0; i < argc; ++i){ */
@@ -128,7 +143,10 @@ int main(int argc, char** argv){
 			/* System 'cp [src] [dst]' */
 			/* Don't use system cp call */
 			if(!strcmp(args[0], "mimic")){
-				printf("mimic\n");
+				int sourceDescriptor = open(args[1], O_RDWR);
+				int destDescriptor = open(args[2], O_CREAT | O_RDWR, S_IRWXU);
+								
+				mimic(sourceDescriptor, destDescriptor);
 			}
 
 			/* System 'rm [file]'	 */
