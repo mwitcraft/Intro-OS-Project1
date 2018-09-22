@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <errno.h>
 
 #define MAX_BUFFER 1024
 #define MAX_ARGS 64
@@ -30,6 +32,15 @@ int mimic(int sourceDescriptor, int destDescriptor){
 	
 
 	return sendfileStatus;
+}
+
+int morph(char* sourcePath, char* destPath){
+	DIR* sourceDir = opendir(sourcePath);
+	if(errno == ENOENT)
+		return -1;
+
+	rename(sourcePath, destPath);
+	return 0;
 }
 
 int main(int argc, char** argv){
@@ -165,7 +176,7 @@ int main(int argc, char** argv){
 			/* System 'mv [src] [dst]' */
 			/* Don't use system call */
 			else if(!strcmp(args[0], "morph")){
-				printf("morph\n");
+				morph(args[1], args[2]);
 			}
 
 			/* System 'cd [path]' */
