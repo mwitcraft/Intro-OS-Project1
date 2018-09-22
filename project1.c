@@ -38,7 +38,7 @@ int main(int argc, char** argv){
 	char* args[MAX_ARGS];
 	char** arg;
 	char* prompt = "==>";
-	int argNum;https://www.google.com/search?q=c+open+permission+denied&ie=utf-8&oe=utf-8&client=firefox-b-1-ab
+	int argNum;
 
 	/* #<{(| printf("argc: %i", argc); |)}># */
 	/* for(int i = 0; i < argc; ++i){ */
@@ -53,18 +53,23 @@ int main(int argc, char** argv){
 
 		/* Waits for input after prompt and stores the input with max size of MAX_BUFFER in buf */
 		if(fgets(buf, MAX_BUFFER, stdin)){
+
+			char* fullInput = buf;
 			
 			/* arg = args; */
 			/* *arg++ = strtok(buf, SEPARATORS); */
 			/* while((*arg++ = strtok(NULL, SEPARATORS))); */
 
-			/* if(args[0]){ */
+			/* if(args[0]){ */https://www.linuxquestions.org/questions/programming-9/get-the-absolute-path-of-file-using-file-descriptor-214080/
                         /*  */
 			/* } */
 
+			printf("%s\n", fullInput);
+			/* printf("Buf: %s\n", buf); */
+
 			argNum = 0;
 
-			char* tkn = strtok(buf, SEPARATORS); 
+			char* tkn = strtok(fullInput, SEPARATORS); 
 			for(int i = 0; tkn != NULL; ++i){
 				++argNum;
 				args[i] = tkn;
@@ -78,14 +83,14 @@ int main(int argc, char** argv){
 			}
 
 			/* System clear */
-			if(!strcmp(args[0], "wipe")){
+			else if(!strcmp(args[0], "wipe")){
 				wipe();
 			}
 
 			/* System 'ls -l [target]' where target may or may not be specified  */
 			/* If target is a file, only print out that file */
 			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
-			if(!strcmp(args[0], "filez")){
+			else if(!strcmp(args[0], "filez")){
 				/* printf("\t%i\n", argNum); */
 				/* printf("Filez\n"); */
 				char* command;
@@ -110,7 +115,7 @@ int main(int argc, char** argv){
 
 			/* System env
 			 * Lists all of the environment strings */
-			if(!strcmp(args[0], "environ")){
+			else if(!strcmp(args[0], "environ")){
 				printf("environ\n");
 				char** env = environ;
 				while(*env){
@@ -127,7 +132,7 @@ int main(int argc, char** argv){
 
 			/* System echo with args */
 			/* 'Echo [comment]' */
-			if(!strcmp(args[0], "ditto")){
+			else if(!strcmp(args[0], "ditto")){
 				char* comment;
 				for(int i = 1; i < argNum; ++i){
 					printf("%s ", args[i]);
@@ -136,13 +141,13 @@ int main(int argc, char** argv){
 			}
 
 			/* Prints README */
-			if(!strcmp(args[0], "help")){
+			else if(!strcmp(args[0], "help")){
 				printf("help\n");
 			}
 
 			/* System 'cp [src] [dst]' */
 			/* Don't use system cp call */
-			if(!strcmp(args[0], "mimic")){
+			else if(!strcmp(args[0], "mimic")){
 				int sourceDescriptor = open(args[1], O_RDWR);
 				int destDescriptor = open(args[2], O_CREAT | O_RDWR, S_IRWXU);
 								
@@ -151,7 +156,7 @@ int main(int argc, char** argv){
 
 			/* System 'rm [file]'	 */
 			/* Don't use system rm call */
-			if(!strcmp(args[0], "erase")){
+			else if(!strcmp(args[0], "erase")){
 				printf("erase\n");
 				remove(args[1]);
 				
@@ -159,15 +164,31 @@ int main(int argc, char** argv){
 
 			/* System 'mv [src] [dst]' */
 			/* Don't use system call */
-			if(!strcmp(args[0], "morph")){
+			else if(!strcmp(args[0], "morph")){
 				printf("morph\n");
 			}
 
 			/* System 'cd [path]' */
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
-			if(!strcmp(args[0], "chdir")){
+			else if(!strcmp(args[0], "chdir")){
 				printf("chdir\n");
+			}
+
+			else{
+
+				char* command = args[0];
+				char* space = " ";
+
+				for(int i = 1; i < argNum; ++i){
+					size_t memToAllocate = strlen(command) + strlen(args[i]) + strlen(space);
+					char* arrayOfCorrectSize = (char*)(malloc)(memToAllocate * sizeof(char));
+					command = strcat(arrayOfCorrectSize, command);
+					command = strcat(command, space);
+					command = strcat(command, args[i]);
+				}
+
+				system(command);
 			}
 
 		}
