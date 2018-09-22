@@ -153,6 +153,8 @@ int main(int argc, char** argv){
 			/* Don't use system rm call */
 			if(!strcmp(args[0], "erase")){
 				printf("erase\n");
+				remove(args[1]);
+				
 			}
 
 			/* System 'mv [src] [dst]' */
