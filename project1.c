@@ -43,6 +43,24 @@ int morph(char* sourcePath, char* destPath){
 	return 0;
 }
 
+int chdir(char* path){
+
+	/* printf("\t path: %s\n", path); */
+	char* cdCommand = "cd ";
+	char* putEnvArg = "PWD=";
+	if(path[0] == '/' || path[0] == '\\'){
+		size_t pathSize =  strlen(putEnvArg) + strlen(path);
+		char* envArgMalloc = (char*)(malloc)(pathSize * sizeof(char));
+		putEnvArg = strcat(envArgMalloc, putEnvArg);
+		printf("PutEnvArg: %s\n", putEnvArg);
+		putEnvArg = strcat(putEnvArg, path);
+		/* free(envArgMalloc); */
+		printf("New Dir = %s\n", putEnvArg);
+		putenv(putEnvArg);
+	}
+	return 0;
+}
+
 int main(int argc, char** argv){
 
 	char buf[MAX_BUFFER];
@@ -75,7 +93,7 @@ int main(int argc, char** argv){
                         /*  */
 			/* } */
 
-			printf("%s\n", fullInput);
+			/* printf("%s\n", fullInput); */
 			/* printf("Buf: %s\n", buf); */
 
 			argNum = 0;
@@ -102,38 +120,46 @@ int main(int argc, char** argv){
 			/* If target is a file, only print out that file */
 			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
 			else if(!strcmp(args[0], "filez")){
-				/* printf("\t%i\n", argNum); */
-				/* printf("Filez\n"); */
-				char* command;
-				if(argNum == 2){
+				
+				char* command = "ls -1 ";
 
-					command = "ls -1 ";
 
-					/* command = strcat(command, args[1]); */
-					/* printf("\t\tCommand: %s", command); */
 
-					size_t len = strlen(command) + strlen(args[1]);
-					char* ret = (char*)(malloc)(len * sizeof(char) + 1);
-					/* *ret = '\0'; */
-					command = strcat(strcat(ret, command), args[1]);
-					/* printf("\t\tCommand: %s\n", command); */
-				} else {
-					command = "ls -1";
-				}
-				/* system("ls -l ../"); */
-				system(command);
+
+				/* #<{(| printf("\t%i\n", argNum); |)}># */
+				/* #<{(| printf("Filez\n"); |)}># */
+				/* char* command; */
+				/* if(argNum == 2){ */
+                                /*  */
+				/* 	command = "ls -1 "; */
+                                /*  */
+				/* 	#<{(| command = strcat(command, args[1]); |)}># */
+				/* 	#<{(| printf("\t\tCommand: %s", command); |)}># */
+                                /*  */
+				/* 	size_t len = strlen(command) + strlen(args[1]); */
+				/* 	char* ret = (char*)(malloc)(len * sizeof(char) + 1); */
+				/* 	#<{(| *ret = '\0'; |)}># */
+				/* 	command = strcat(strcat(ret, command), args[1]); */
+				/* 	#<{(| printf("\t\tCommand: %s\n", command); |)}># */
+				/* } else { */
+				/* 	command = "ls -1"; */
+				/* } */
+				/* #<{(| system("ls -l ../"); |)}># */
+				/* system(command); */
 			}
 
 			/* System env
 			 * Lists all of the environment strings */
 			else if(!strcmp(args[0], "environ")){
-				printf("environ\n");
+				/* putenv("PWD=I/Changed/It"); */
+				/* printf("environ\n"); */
 				char** env = environ;
 				while(*env){
-					if(strstr(*env, "PWD") != NULL && strstr(*env, "OLDPWD") == NULL){
-						/* *env = "PWD=I/CHANGED/IT"; */
-						printf("\t\t%s\n", *env);
-					}
+					printf("%s\n", *env);
+					/* if(strstr(*env, "PWD") != NULL && strstr(*env, "OLDPWD") == NULL){ */
+					/* 	#<{(| *env = "PWD=I/CHANGED/IT"; |)}># */
+					/* 	printf("\t\t%s\n", *env); */
+					/* } */
 					*env++;
 					/* printf("%s\n", *env++); */
 
@@ -183,7 +209,7 @@ int main(int argc, char** argv){
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			else if(!strcmp(args[0], "chdir")){
-				printf("chdir\n");
+				chdir(args[1])
 			}
 
 			else{
@@ -197,6 +223,7 @@ int main(int argc, char** argv){
 					command = strcat(arrayOfCorrectSize, command);
 					command = strcat(command, space);
 					command = strcat(command, args[i]);
+					/* free arrayOfCorrectSize; */
 				}
 
 				system(command);
