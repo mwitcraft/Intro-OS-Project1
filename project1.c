@@ -91,6 +91,22 @@ int morph(char* sourcePath, char* destPath){
 	return 0;
 }
 
+int mychdir(char* input){
+
+	chdir(input);
+	char cwd[256];
+	getcwd(cwd, sizeof(cwd));
+	printf("CWD: %s\n", cwd);
+	char* updateEnv = "PWD=";
+	size_t updateEnvSize = strlen(updateEnv) + strlen(cwd);
+	char* updateEnvSizeMem = (char*)(malloc)(updateEnvSize * sizeof(char));
+	updateEnv = strcat(updateEnvSizeMem, updateEnv);
+	updateEnv = strcat(updateEnv, input);
+	putenv(updateEnv);
+
+	return 0;
+}
+
 /* int chdir(char* path){ */
 /*  */
 /* 	#<{(| printf("\t path: %s\n", path); |)}># */
@@ -288,13 +304,18 @@ int main(int argc, char** argv){
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			else if(!strcmp(args[0], "chdir")){
-				char* cwd = getenv("PWD");
-				char* cwddash = strcat(cwd, "/");
-				char* to = strcat(cwddash, args[1]);
-				printf("\t%s\n", to);
-				if(chdir(to) == -1){
-					printf("Error\n");
-				}
+				/* char* cwd = getenv("PWD"); */
+				/* char* cwddash = strcat(cwd, "/"); */
+				/* char* to = strcat(cwddash, args[1]); */
+				/* printf("\t%s\n", to); */
+				/* if(chdir(to) == -1){ */
+				/* 	printf("Error\n"); */
+				/* } */
+				mychdir(args[1]);
+				/* chdir(args[1]); */
+				/* char cwd[256]; */
+				/* getcwd(cwd, sizeof(cwd)); */
+				/* printf("CWD: %s\n", cwd); */
 			}
 
 			else{
