@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <errno.h>
+#include <unistd.h>
 
 #define MAX_BUFFER 1024
 #define MAX_ARGS 64
@@ -19,11 +20,58 @@ int wipe(){
 	return 0;
 }
 
-int filez(){
+int filez(char* target){
+
+	char* command;
+
+	if(target == NULL)
+		command = "ls -1";
+	else{
+		command = "ls -1 ";
+		size_t spaceNeeded = strlen(command) + strlen(target);
+		char* spaceNeededStr = (char*)(malloc)(spaceNeeded * sizeof(char));
+		command = strcat(spaceNeededStr, command);
+		command = strcat(command, target);
+	}
+
+	return system(command);
+
+	/* if(argNum == 1) */
+	/* 	command = "ls -1"; */
+	/* if(argNum == 2){ */
+	/* 	command = "ls -1 "; */
+	/* 	size_t spaceNeeded = strlen(command) + strlen(args[1]); */
+	/* 	char* spaceNeededStr = (char*)(malloc)(spaceNeeded * sizeof(char)); */
+	/* 	command = strcat(spaceNeededStr, command); */
+	/* 	command = strcat(command, args[1]); */
+	/* } */
+	/* #<{(| system(command); |)}># */
+        /*  */
+	/* system(command); */
+	
+	/* return 0; */
+}
+
+int help(char* projectPath){
+
+	char* readmeFileName = "/README.txt";
+	size_t readmePathSize = strlen(projectPath) + strlen(readmeFileName);
+	char* readmePath = (char*)(malloc)(readmePathSize * sizeof(char));
+	readmePath = strcat(readmePath, projectPath);
+	readmePath = strcat(readmePath, readmeFileName);
+
+	FILE* readme = fopen(readmePath, "r");
+		
+	char c = fgetc(readme);
+	while(c != EOF){
+		printf("%c", c);
+		c = fgetc(readme);
+	}
 	return 0;
 }
 
 int mimic(int sourceDescriptor, int destDescriptor){
+
 	struct stat toGetSize;
 	fstat(sourceDescriptor, &toGetSize);
 	int sourceSizeInBytes = toGetSize.st_size;
@@ -43,23 +91,23 @@ int morph(char* sourcePath, char* destPath){
 	return 0;
 }
 
-int chdir(char* path){
-
-	/* printf("\t path: %s\n", path); */
-	char* cdCommand = "cd ";
-	char* putEnvArg = "PWD=";
-	if(path[0] == '/' || path[0] == '\\'){
-		size_t pathSize =  strlen(putEnvArg) + strlen(path);
-		char* envArgMalloc = (char*)(malloc)(pathSize * sizeof(char));
-		putEnvArg = strcat(envArgMalloc, putEnvArg);
-		printf("PutEnvArg: %s\n", putEnvArg);
-		putEnvArg = strcat(putEnvArg, path);
-		/* free(envArgMalloc); */
-		printf("New Dir = %s\n", putEnvArg);
-		putenv(putEnvArg);
-	}
-	return 0;
-}
+/* int chdir(char* path){ */
+/*  */
+/* 	#<{(| printf("\t path: %s\n", path); |)}># */
+/* 	char* cdCommand = "cd "; */
+/* 	char* putEnvArg = "PWD="; */
+/* 	if(path[0] == '/' || path[0] == '\\'){ */
+/* 		size_t pathSize =  strlen(putEnvArg) + strlen(path); */
+/* 		char* envArgMalloc = (char*)(malloc)(pathSize * sizeof(char)); */
+/* 		putEnvArg = strcat(envArgMalloc, putEnvArg); */
+/* 		printf("PutEnvArg: %s\n", putEnvArg); */
+/* 		putEnvArg = strcat(putEnvArg, path); */
+/* 		#<{(| free(envArgMalloc); |)}># */
+/* 		printf("New Dir = %s\n", putEnvArg); */
+/* 		putenv(putEnvArg); */
+/* 	} */
+/* 	return 0; */
+/* } */
 
 int main(int argc, char** argv){
 
@@ -69,22 +117,22 @@ int main(int argc, char** argv){
 	char* prompt = "==>";
 	int argNum;
 
-	/* #<{(| printf("argc: %i", argc); |)}># */
-	/* for(int i = 0; i < argc; ++i){ */
-	/* 	fputs("==>", stdout); */
-	/* 	printf("Arg[%i]: %s\n", i, argv[i]); */
-	/* } */
+	char* pathPnt = getenv("PWD");
+	char path[strlen(pathPnt) + 1];
+	for(int i = 0; i < (int)strlen(pathPnt); ++i){
+		path[i] = pathPnt[i];
+	}
+	path[strlen(pathPnt)] = '\0';
 
 	while(!feof(stdin)){
 
 		/* Prints prompt out */
 		fputs(prompt, stdout);
-
 		/* Waits for input after prompt and stores the input with max size of MAX_BUFFER in buf */
 		if(fgets(buf, MAX_BUFFER, stdin)){
 
 			char* fullInput = buf;
-			
+
 			/* arg = args; */
 			/* *arg++ = strtok(buf, SEPARATORS); */
 			/* while((*arg++ = strtok(NULL, SEPARATORS))); */
@@ -120,11 +168,42 @@ int main(int argc, char** argv){
 			/* If target is a file, only print out that file */
 			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
 			else if(!strcmp(args[0], "filez")){
-				
-				char* command = "ls -1 ";
+			
+				if(argNum == 1)
+					filez(NULL);
+				if(argNum ==2)
+					filez(args[1]);
+				if(argNum > 2)
+					fprintf(stderr, "Error, too many arguments");
+				/* char* command; */
+				/* #<{(| system(command); |)}># */
+                                /*  */
+                                /*  */
+				/* if(argNum == 1) */
+				/* 	command = "ls -1"; */
+				/* if(argNum == 2){ */
+				/* 	command = "ls -1 "; */
+				/* 	size_t spaceNeeded = strlen(command) + strlen(args[1]); */
+				/* 	char* spaceNeededStr = (char*)(malloc)(spaceNeeded * sizeof(char)); */
+				/* 	command = strcat(spaceNeededStr, command); */
+				/* 	command = strcat(command, args[1]); */
+				/* } */
+				/* #<{(| system(command); |)}># */
+                                /*  */
+				/* system(command); */
 
-
-
+				/* if(argNum == 2){ */
+				/* 	if(!strcmp(&args[1][0], "/") || !strcmp(&args[1][0], "\\")){ */
+				/* 		char* cwd = getenv("PWD"); */
+				/* 	} */
+				/* } */
+                                /*  */
+				/* char* cwd = getenv("PWD"); */
+				/* #<{(| printf("\t%s\n", cwd); |)}># */
+                                /*  */
+				/* char* newDir = strcat(cwd, "/"); */
+				/* chc refer to where program livesar* to = strcat(newDir, args[1]); */
+				/* printf("\t%s\n", to); */
 
 				/* #<{(| printf("\t%i\n", argNum); |)}># */
 				/* #<{(| printf("Filez\n"); |)}># */
@@ -170,7 +249,7 @@ int main(int argc, char** argv){
 			/* System echo with args */
 			/* 'Echo [comment]' */
 			else if(!strcmp(args[0], "ditto")){
-				char* comment;
+				/* char* comment; */
 				for(int i = 1; i < argNum; ++i){
 					printf("%s ", args[i]);
 				}
@@ -179,7 +258,7 @@ int main(int argc, char** argv){
 
 			/* Prints README */
 			else if(!strcmp(args[0], "help")){
-				printf("help\n");
+				help(path);
 			}
 
 			/* System 'cp [src] [dst]' */
@@ -209,7 +288,13 @@ int main(int argc, char** argv){
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			else if(!strcmp(args[0], "chdir")){
-				chdir(args[1])
+				char* cwd = getenv("PWD");
+				char* cwddash = strcat(cwd, "/");
+				char* to = strcat(cwddash, args[1]);
+				printf("\t%s\n", to);
+				if(chdir(to) == -1){
+					printf("Error\n");
+				}
 			}
 
 			else{
