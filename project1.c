@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #define MAX_BUFFER 1024
 #define MAX_ARGS 64
@@ -94,6 +95,20 @@ int morph(char* sourcePath, char* destPath){
 	int isDir = S_ISDIR(destBuf.st_mode);
 
 	printf("Dest Directory? %i\n", isDir);
+
+	if(isDir != 0){
+		char* sourceBaseName = basename(fullSourcePath);
+		size_t fullDestPathWithFileNameLength = strlen(fullDestPath) + strlen(slash) + strlen(sourceBaseName);
+		char* fullDestPathWithFileName = (char*)(malloc)(fullDestPathWithFileNameLength * sizeof(char));
+		fullDestPathWithFileName = strcat(fullDestPathWithFileName, fullDestPath);
+		fullDestPathWithFileName = strcat(fullDestPathWithFileName, slash);
+		fullDestPathWithFileName = strcat(fullDestPathWithFileName, sourceBaseName);
+		fullDestPath = fullDestPathWithFileName;
+	}
+
+	/* char* sourceFileName = basename(fullSourcePath); */
+
+	/* printf("Source File Name: %s\n", sourceFileName); */
 
 	DIR* sourceDir = opendir(sourcePath);
 	if(errno == ENOENT)
