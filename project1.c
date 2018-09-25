@@ -13,6 +13,8 @@
 #define MAX_ARGS 64
 #define SEPARATORS " \t\n"
 
+/* morph will only test if mimic src is file */
+
 extern char** environ;
 
 int wipe(){
@@ -77,7 +79,6 @@ int mimic(int sourceDescriptor, int destDescriptor){
 	int sourceSizeInBytes = toGetSize.st_size;
 	
 	int sendfileStatus = sendfile(destDescriptor, sourceDescriptor, NULL, sourceSizeInBytes);
-	
 
 	return sendfileStatus;
 }
@@ -101,7 +102,7 @@ int mychdir(char* input){
 	size_t updateEnvSize = strlen(updateEnv) + strlen(cwd);
 	char* updateEnvSizeMem = (char*)(malloc)(updateEnvSize * sizeof(char));
 	updateEnv = strcat(updateEnvSizeMem, updateEnv);
-	updateEnv = strcat(updateEnv, input);
+	updateEnv = strcat(updateEnv, cwd);
 	putenv(updateEnv);
 
 	return 0;
