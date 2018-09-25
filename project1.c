@@ -37,21 +37,6 @@ int filez(char* target){
 	}
 
 	return system(command);
-
-	/* if(argNum == 1) */
-	/* 	command = "ls -1"; */
-	/* if(argNum == 2){ */
-	/* 	command = "ls -1 "; */
-	/* 	size_t spaceNeeded = strlen(command) + strlen(args[1]); */
-	/* 	char* spaceNeededStr = (char*)(malloc)(spaceNeeded * sizeof(char)); */
-	/* 	command = strcat(spaceNeededStr, command); */
-	/* 	command = strcat(command, args[1]); */
-	/* } */
-	/* #<{(| system(command); |)}># */
-        /*  */
-	/* system(command); */
-	
-	/* return 0; */
 }
 
 int help(char* projectPath){
@@ -97,7 +82,7 @@ int mychdir(char* input){
 	chdir(input);
 	char cwd[256];
 	getcwd(cwd, sizeof(cwd));
-	printf("CWD: %s\n", cwd);
+	/* printf("CWD: %s\n", cwd); */
 	char* updateEnv = "PWD=";
 	size_t updateEnvSize = strlen(updateEnv) + strlen(cwd);
 	char* updateEnvSizeMem = (char*)(malloc)(updateEnvSize * sizeof(char));
@@ -107,24 +92,6 @@ int mychdir(char* input){
 
 	return 0;
 }
-
-/* int chdir(char* path){ */
-/*  */
-/* 	#<{(| printf("\t path: %s\n", path); |)}># */
-/* 	char* cdCommand = "cd "; */
-/* 	char* putEnvArg = "PWD="; */
-/* 	if(path[0] == '/' || path[0] == '\\'){ */
-/* 		size_t pathSize =  strlen(putEnvArg) + strlen(path); */
-/* 		char* envArgMalloc = (char*)(malloc)(pathSize * sizeof(char)); */
-/* 		putEnvArg = strcat(envArgMalloc, putEnvArg); */
-/* 		printf("PutEnvArg: %s\n", putEnvArg); */
-/* 		putEnvArg = strcat(putEnvArg, path); */
-/* 		#<{(| free(envArgMalloc); |)}># */
-/* 		printf("New Dir = %s\n", putEnvArg); */
-/* 		putenv(putEnvArg); */
-/* 	} */
-/* 	return 0; */
-/* } */
 
 int main(int argc, char** argv){
 
@@ -140,6 +107,9 @@ int main(int argc, char** argv){
 		path[i] = pathPnt[i];
 	}
 	path[strlen(pathPnt)] = '\0';
+	
+	FILE* batchFile;
+	if(argc == 1)
 
 	while(!feof(stdin)){
 
@@ -149,17 +119,6 @@ int main(int argc, char** argv){
 		if(fgets(buf, MAX_BUFFER, stdin)){
 
 			char* fullInput = buf;
-
-			/* arg = args; */
-			/* *arg++ = strtok(buf, SEPARATORS); */
-			/* while((*arg++ = strtok(NULL, SEPARATORS))); */
-
-			/* if(args[0]){ */https://www.linuxquestions.org/questions/programming-9/get-the-absolute-path-of-file-using-file-descriptor-214080/
-                        /*  */
-			/* } */
-
-			/* printf("%s\n", fullInput); */
-			/* printf("Buf: %s\n", buf); */
 
 			argNum = 0;
 
@@ -192,56 +151,6 @@ int main(int argc, char** argv){
 					filez(args[1]);
 				if(argNum > 2)
 					fprintf(stderr, "Error, too many arguments");
-				/* char* command; */
-				/* #<{(| system(command); |)}># */
-                                /*  */
-                                /*  */
-				/* if(argNum == 1) */
-				/* 	command = "ls -1"; */
-				/* if(argNum == 2){ */
-				/* 	command = "ls -1 "; */
-				/* 	size_t spaceNeeded = strlen(command) + strlen(args[1]); */
-				/* 	char* spaceNeededStr = (char*)(malloc)(spaceNeeded * sizeof(char)); */
-				/* 	command = strcat(spaceNeededStr, command); */
-				/* 	command = strcat(command, args[1]); */
-				/* } */
-				/* #<{(| system(command); |)}># */
-                                /*  */
-				/* system(command); */
-
-				/* if(argNum == 2){ */
-				/* 	if(!strcmp(&args[1][0], "/") || !strcmp(&args[1][0], "\\")){ */
-				/* 		char* cwd = getenv("PWD"); */
-				/* 	} */
-				/* } */
-                                /*  */
-				/* char* cwd = getenv("PWD"); */
-				/* #<{(| printf("\t%s\n", cwd); |)}># */
-                                /*  */
-				/* char* newDir = strcat(cwd, "/"); */
-				/* chc refer to where program livesar* to = strcat(newDir, args[1]); */
-				/* printf("\t%s\n", to); */
-
-				/* #<{(| printf("\t%i\n", argNum); |)}># */
-				/* #<{(| printf("Filez\n"); |)}># */
-				/* char* command; */
-				/* if(argNum == 2){ */
-                                /*  */
-				/* 	command = "ls -1 "; */
-                                /*  */
-				/* 	#<{(| command = strcat(command, args[1]); |)}># */
-				/* 	#<{(| printf("\t\tCommand: %s", command); |)}># */
-                                /*  */
-				/* 	size_t len = strlen(command) + strlen(args[1]); */
-				/* 	char* ret = (char*)(malloc)(len * sizeof(char) + 1); */
-				/* 	#<{(| *ret = '\0'; |)}># */
-				/* 	command = strcat(strcat(ret, command), args[1]); */
-				/* 	#<{(| printf("\t\tCommand: %s\n", command); |)}># */
-				/* } else { */
-				/* 	command = "ls -1"; */
-				/* } */
-				/* #<{(| system("ls -l ../"); |)}># */
-				/* system(command); */
 			}
 
 			/* System env
@@ -252,13 +161,7 @@ int main(int argc, char** argv){
 				char** env = environ;
 				while(*env){
 					printf("%s\n", *env);
-					/* if(strstr(*env, "PWD") != NULL && strstr(*env, "OLDPWD") == NULL){ */
-					/* 	#<{(| *env = "PWD=I/CHANGED/IT"; |)}># */
-					/* 	printf("\t\t%s\n", *env); */
-					/* } */
 					*env++;
-					/* printf("%s\n", *env++); */
-
 				}
 				
 			}
@@ -290,7 +193,6 @@ int main(int argc, char** argv){
 			/* System 'rm [file]'	 */
 			/* Don't use system rm call */
 			else if(!strcmp(args[0], "erase")){
-				printf("erase\n");
 				remove(args[1]);
 				
 			}
@@ -305,18 +207,7 @@ int main(int argc, char** argv){
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			else if(!strcmp(args[0], "chdir")){
-				/* char* cwd = getenv("PWD"); */
-				/* char* cwddash = strcat(cwd, "/"); */
-				/* char* to = strcat(cwddash, args[1]); */
-				/* printf("\t%s\n", to); */
-				/* if(chdir(to) == -1){ */
-				/* 	printf("Error\n"); */
-				/* } */
 				mychdir(args[1]);
-				/* chdir(args[1]); */
-				/* char cwd[256]; */
-				/* getcwd(cwd, sizeof(cwd)); */
-				/* printf("CWD: %s\n", cwd); */
 			}
 
 			else{
