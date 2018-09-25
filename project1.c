@@ -69,11 +69,39 @@ int mimic(int sourceDescriptor, int destDescriptor){
 }
 
 int morph(char* sourcePath, char* destPath){
+
+	char* cwd = getenv("PWD");
+	char* slash = "/";
+	size_t fullSourcePathLength = strlen(cwd) + strlen(sourcePath) + strlen(slash);
+	size_t fullDestPathLength = strlen(cwd) + strlen(destPath) + strlen(slash);
+	char* fullSourcePath = (char*)(malloc)(fullSourcePathLength * sizeof(char));
+	char* fullDestPath = (char*)(malloc)(fullDestPathLength * sizeof(char));
+	fullSourcePath = strcat(fullSourcePath, cwd);
+	fullDestPath = strcat(fullDestPath, cwd);
+	fullSourcePath = strcat(fullSourcePath, slash);
+	fullDestPath = strcat(fullDestPath, slash);
+	fullSourcePath = strcat(fullSourcePath, sourcePath);
+	fullDestPath = strcat(fullDestPath, destPath);
+
+    	struct stat buf;
+    	stat(fullSourcePath, &buf);
+    	int isFile = S_ISREG(buf.st_mode);
+
+	printf("Source File? %i\n", isFile);
+
+	struct stat destBuf;
+	stat(fullDestPath, &destBuf);
+	int isDir = S_ISDIR(destBuf.st_mode);
+
+	printf("Dest Directory? %i\n", isDir);
+
 	DIR* sourceDir = opendir(sourcePath);
 	if(errno == ENOENT)
 		return -1;
 
-	rename(sourcePath, destPath);
+	printf("Moving '%s', into '%s'\n", fullSourcePath, fullDestPath);
+	
+	rename(fullSourcePath, fullDestPath);
 	return 0;
 }
 
