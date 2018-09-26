@@ -14,8 +14,6 @@
 #define MAX_ARGS 64
 #define SEPARATORS " \t\n"
 
-/* morph will only test if mimic src is file */
-
 extern char** environ;
 
 int wipe(){
@@ -49,6 +47,10 @@ int help(char* projectPath){
 	readmePath = strcat(readmePath, readmeFileName);
 
 	FILE* readme = fopen(readmePath, "r");
+	if(readme == NULL){
+		fprintf(stderr, "ERROR: %s; cannot find README\n", strerror(errno));
+		return -1;
+	}
 		
 	char c = fgetc(readme);
 	while(c != EOF){
@@ -58,15 +60,37 @@ int help(char* projectPath){
 	return 0;
 }
 
-int mimic(int sourceDescriptor, int destDescriptor){
+int mimic(char* sourcePath, char* destPath){
+
+	struct stat sourceBuf;
+	stat(sourcePath, &sourceBuf);
+	if(S_ISREG(sourceBuf.st_mode) == 0){
+		fprintf(stderr, "ERROR: Source is not file\n");
+		return -1;
+	}
+
+	int sourceDescriptor = open(sourcePath, O_RDWR);
+	int destDescriptor = open(destPath, O_CREAT | O_RDWR, S_IRWXU);
 
 	struct stat toGetSize;
 	fstat(sourceDescriptor, &toGetSize);
 	int sourceSizeInBytes = toGetSize.st_size;
-	
-	int sendfileStatus = sendfile(destDescriptor, sourceDescriptor, NULL, sourceSizeInBytes);
 
-	return sendfileStatus;
+	if(sendfile(destDescriptor, sourceDescriptor, NULL, sourceSizeInBytes) == -1){
+		fprintf(stderr, "ERROR: Invalid mimic destination\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+int erase(char* path){ 
+	if(remove(path) == -1){
+		fprintf(stderr, "ERROR: %s\n", strerror(errno));
+		return -1;
+	}
+
+	return 0;
 }
 
 int morph(char* sourcePath, char* destPath){
@@ -88,17 +112,22 @@ int morph(char* sourcePath, char* destPath){
 	}
 
 	if(rename(sourcePath, destPath) == -1){
-		fprintf(stderr, "Error: %s\n", strerror(errno));
+		fprintf(stderr, "ERROR: %s\n", strerror(errno));
+		return -1;
 	}
+
 	return 0;
 }
 
 int mychdir(char* input){
 
-	chdir(input);
+	if(chdir(input) == -1){
+		fprintf(stderr, "ERROR: %s\n", strerror(errno));
+		return -1;
+	}
+
 	char cwd[256];
 	getcwd(cwd, sizeof(cwd));
-	/* printf("CWD: %s\n", cwd); */
 	char* updateEnv = "PWD=";
 	size_t updateEnvSize = strlen(updateEnv) + strlen(cwd);
 	char* updateEnvSizeMem = (char*)(malloc)(updateEnvSize * sizeof(char));
@@ -148,82 +177,114 @@ int main(int argc, char** argv){
 
 			/* System exit */
 			if(!strcmp(args[0], "esc")){
-				break;
+				if(argNum > 1){
+					fprintf(stderr, "ERROR: Too many arguments\n");
+				}
+				else{
+					break;
+				}
 			}
 
 			/* System clear */
 			else if(!strcmp(args[0], "wipe")){
-				wipe();
+				if(argNum > 1)
+					fprintf(stderr, "ERROR: Too many arguments\n");
+				else
+					wipe();
 			}
 
 			/* System 'ls -l [target]' where target may or may not be specified  */
 			/* If target is a file, only print out that file */
 			/* https://stackoverflow.com/questions/7920793/how-to-add-a-character-at-end-of-string# */
 			else if(!strcmp(args[0], "filez")){
-			
-				if(argNum == 1)
-					filez(NULL);
-				if(argNum ==2)
-					filez(args[1]);
 				if(argNum > 2)
-					fprintf(stderr, "Error, too many arguments");
+					fprintf(stderr, "ERROR: Too many arguments\n");
+				else{
+					if(argNum == 1)
+						filez(NULL);
+					if(argNum ==2)
+						filez(args[1]);
+				}
 			}
 
 			/* System env
 			 * Lists all of the environment strings */
 			else if(!strcmp(args[0], "environ")){
-				/* putenv("PWD=I/Changed/It"); */
-				/* printf("environ\n"); */
-				char** env = environ;
-				while(*env){
-					printf("%s\n", *env);
-					*env++;
+				if(argNum > 1){
+					fprintf(stderr, "ERROR: Too many arguments\n");
 				}
+				else{ 
+					char** env = environ;
+					while(*env){
+						printf("%s\n", *env);
+						*env++;
+					}
 				
+				}
 			}
 
 			/* System echo with args */
 			/* 'Echo [comment]' */
 			else if(!strcmp(args[0], "ditto")){
-				/* char* comment; */
-				for(int i = 1; i < argNum; ++i){
-					printf("%s ", args[i]);
+				if(argNum != 1){
+					for(int i = 1; i < argNum; ++i){
+						printf("%s ", args[i]);
+					}
+					printf("\n");
 				}
-				printf("\n");
 			}
 
 			/* Prints README */
 			else if(!strcmp(args[0], "help")){
-				help(path);
+				if(argNum > 1)
+					fprintf(stderr, "ERROR: Too many arguments\n");
+				else
+					help(path);
 			}
 
 			/* System 'cp [src] [dst]' */
 			/* Don't use system cp call */
 			else if(!strcmp(args[0], "mimic")){
-				int sourceDescriptor = open(args[1], O_RDWR);
-				int destDescriptor = open(args[2], O_CREAT | O_RDWR, S_IRWXU);
-								
-				mimic(sourceDescriptor, destDescriptor);
+				if(argNum == 3)
+					mimic(args[1], args[2]);
+				else if(argNum < 3)
+					fprintf(stderr, "ERROR: Too few arguments\n");
+				else if(argNum > 3)
+					fprintf(stderr, "ERROR: Too many arguments\n");
 			}
 
 			/* System 'rm [file]'	 */
 			/* Don't use system rm call */
 			else if(!strcmp(args[0], "erase")){
-				remove(args[1]);
+				if(argNum < 2)
+					fprintf(stderr, "ERROR: Too few arguments\n");
+				else
+					for(int i = 1; i < argNum; ++i)
+						erase(args[i]);
 				
 			}
 
 			/* System 'mv [src] [dst]' */
 			/* Don't use system call */
 			else if(!strcmp(args[0], "morph")){
-				morph(args[1], args[2]);
+				if(argNum == 3)
+					morph(args[1], args[2]);
+				else if(argNum < 3)
+					fprintf(stderr, "ERROR: Too few arguments\n");
+				else if(argNum > 3)
+					fprintf(stderr, "ERROR: Too many arguments\n");
 			}
 
 			/* System 'cd [path]' */
 			/* If path is not specified, print current working directory */
 			/* Update PWD environment variable using putenv function */
 			else if(!strcmp(args[0], "chdir")){
-				mychdir(args[1]);
+				if(argNum == 1)
+					printf("%s\n", getenv("PWD"));
+				else if(argNum > 2)
+					fprintf(stderr, "ERROR: Too many arguments\n");
+				else
+					mychdir(args[1]);
 			}
 
 			else{
