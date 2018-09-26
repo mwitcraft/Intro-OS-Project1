@@ -71,52 +71,25 @@ int mimic(int sourceDescriptor, int destDescriptor){
 
 int morph(char* sourcePath, char* destPath){
 
-	char* cwd = getenv("PWD");
+	struct stat destPathBuf;
+	stat(destPath, &destPathBuf);
+	int isDestDirectory = S_ISDIR(destPathBuf.st_mode);
+
 	char* slash = "/";
-	size_t fullSourcePathLength = strlen(cwd) + strlen(sourcePath) + strlen(slash);
-	size_t fullDestPathLength = strlen(cwd) + strlen(destPath) + strlen(slash);
-	char* fullSourcePath = (char*)(malloc)(fullSourcePathLength * sizeof(char));
-	char* fullDestPath = (char*)(malloc)(fullDestPathLength * sizeof(char));
-	fullSourcePath = strcat(fullSourcePath, cwd);
-	fullDestPath = strcat(fullDestPath, cwd);
-	fullSourcePath = strcat(fullSourcePath, slash);
-	fullDestPath = strcat(fullDestPath, slash);
-	fullSourcePath = strcat(fullSourcePath, sourcePath);
-	fullDestPath = strcat(fullDestPath, destPath);
+	if(isDestDirectory != 0){
+		char* sourceBaseName = basename(sourcePath);
+		size_t destPathWithFileNameSize = strlen(destPath) + strlen(slash) + strlen(sourceBaseName);
+		char* destPathWithFileName = (char*)(malloc)(destPathWithFileNameSize * sizeof(char));
+		destPathWithFileName = strcat(destPathWithFileName, destPath);
+		destPathWithFileName = strcat(destPathWithFileName, slash);
+		destPathWithFileName = strcat(destPathWithFileName, sourceBaseName);
+		destPath = destPathWithFileName;
 
-    	struct stat buf;
-    	stat(fullSourcePath, &buf);
-    	int isFile = S_ISREG(buf.st_mode);
-
-	printf("Source File? %i\n", isFile);
-
-	struct stat destBuf;
-	stat(fullDestPath, &destBuf);
-	int isDir = S_ISDIR(destBuf.st_mode);
-
-	printf("Dest Directory? %i\n", isDir);
-
-	if(isDir != 0){
-		char* sourceBaseName = basename(fullSourcePath);
-		size_t fullDestPathWithFileNameLength = strlen(fullDestPath) + strlen(slash) + strlen(sourceBaseName);
-		char* fullDestPathWithFileName = (char*)(malloc)(fullDestPathWithFileNameLength * sizeof(char));
-		fullDestPathWithFileName = strcat(fullDestPathWithFileName, fullDestPath);
-		fullDestPathWithFileName = strcat(fullDestPathWithFileName, slash);
-		fullDestPathWithFileName = strcat(fullDestPathWithFileName, sourceBaseName);
-		fullDestPath = fullDestPathWithFileName;
 	}
 
-	/* char* sourceFileName = basename(fullSourcePath); */
-
-	/* printf("Source File Name: %s\n", sourceFileName); */
-
-	DIR* sourceDir = opendir(sourcePath);
-	if(errno == ENOENT)
-		return -1;
-
-	printf("Moving '%s', into '%s'\n", fullSourcePath, fullDestPath);
-	
-	rename(fullSourcePath, fullDestPath);
+	if(rename(sourcePath, destPath) == -1){
+		fprintf(stderr, "Error: %s\n", strerror(errno));
+	}
 	return 0;
 }
 
