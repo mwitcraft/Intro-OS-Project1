@@ -154,12 +154,22 @@ int main(int argc, char** argv){
 	path[strlen(pathPnt)] = '\0';
 	
 	FILE* batchFile;
-	if(argc == 1)
+	if(argc == 2){
+		batchFile = fopen(args[1], "r");
+		if(batchFile == NULL)
+			fprintf(stderr, "ERROR: %s", strerror(errno));
+	}
+	else if(argc == 1)
+		batchFile = stdin;
+	else
+		fprintf(stderr, "ERROR: Unexpected arguments");
+	
 
 	while(!feof(stdin)){
 
 		/* Prints prompt out */
 		fputs(prompt, stdout);
+
 		/* Waits for input after prompt and stores the input with max size of MAX_BUFFER in buf */
 		if(fgets(buf, MAX_BUFFER, stdin)){
 
@@ -174,6 +184,25 @@ int main(int argc, char** argv){
 				/* printf("%s\n", tkn); */
 				tkn = strtok(NULL, SEPARATORS);
 			}
+
+			if(batchFile != NULL){
+				for(int i = 0; i < argNum; ++i){
+					printf("%s", args[i]);
+				}
+				printf("\n");
+			}
+
+			/* if(batchFile != NULL){ */
+			/* 	printf("%s", prompt); */
+			/* 	for(int i = 0; i < argNum; ++i){ */
+			/* 		printf("%s ", args[i]); */
+			/* 	} */
+			/* 	printf("\n"); */
+			/* } */
+			/* else{  */
+			/* 	printf("%s", prompt); */
+			/* } */
+
 
 			/* System exit */
 			if(!strcmp(args[0], "esc")){
