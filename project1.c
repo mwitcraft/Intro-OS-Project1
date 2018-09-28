@@ -155,7 +155,8 @@ int main(int argc, char** argv){
 	
 	FILE* batchFile;
 	if(argc == 2){
-		batchFile = fopen(args[1], "r");
+		batchFile = fopen(argv[1], "r");
+		stdin = batchFile;
 		if(batchFile == NULL)
 			fprintf(stderr, "ERROR: %s", strerror(errno));
 	}
@@ -336,5 +337,6 @@ int main(int argc, char** argv){
 		}
 
 	}
+	printf("\n");
 	return 0;
 }
