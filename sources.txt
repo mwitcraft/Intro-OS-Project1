@@ -1,3 +1,0 @@
-http://man7.org/tlpi/code/online/book/fileio/copy.c.html
-    -Source where I found the code to copy a file.
-    -It is from the book
