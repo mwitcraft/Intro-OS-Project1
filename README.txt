@@ -21,8 +21,9 @@ Executable can be run a few ways:
     2. With piping in a batch file (./project1 < batch or cat batch | ./project1) or supplying a batch file as an argument (./project1 batch)
         This will run the shell with the commands outlined in batch, printing the input after the prompt and the output on line beneath prompt. Program exits on end of batch file.
         
-Current bugs:
+Current bugs and issues/concerns:
     Shell repeats input below prompt if run without supplying batch file
+    makefile is very simple, on make clean just moves files that I want to keep to parent directory then deletes remaining files before moving other files back
     
 Sources:
 https://oudalab.github.io/cs3113fa18/projects/project1
