@@ -153,18 +153,18 @@ int main(int argc, char** argv){
 	}
 	path[strlen(pathPnt)] = '\0';
 	
-	FILE* batchFile;
+	FILE* batchFile = NULL;
 	if(argc == 2){
 		batchFile = fopen(argv[1], "r");
 		stdin = batchFile;
 		if(batchFile == NULL)
 			fprintf(stderr, "ERROR: %s", strerror(errno));
 	}
-	else if(argc == 1)
+	else if(argc == 1 && !feof(stdin)){
 		batchFile = stdin;
-	else
+	}
+	else if(argc != 1)
 		fprintf(stderr, "ERROR: Unexpected arguments");
-	
 
 	while(!feof(stdin)){
 
